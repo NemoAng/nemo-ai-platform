@@ -87,3 +87,38 @@ def ai_provider_error_handler(request, exc: AIProviderError):
     )
 
 
+@app.get("/ai/provider/health")
+def ai_provider_health():
+    provider = get_ai_provider()
+
+    chat_ok = False
+    embedding_ok = False
+    chat_error = None
+    embedding_error = None
+
+    try:
+        answer = provider.chat([
+            {"role": "user", "content": "Reply with OK only."}
+        ])
+        chat_ok = bool(answer)
+    except Exception as exc:
+        chat_error = str(exc)
+
+    try:
+        embedding = provider.embed("health check")
+        embedding_ok = isinstance(embedding, list) and len(embedding) > 0
+    except Exception as exc:
+        embedding_error = str(exc)
+
+    return {
+        "provider": provider.name,
+        "chat": {
+            "ok": chat_ok,
+            "error": chat_error,
+        },
+        "embedding": {
+            "ok": embedding_ok,
+            "error": embedding_error,
+        },
+    }
+
