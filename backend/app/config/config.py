@@ -9,6 +9,11 @@ class Settings(BaseSettings):
 
     default_ai_provider: str = "dummy"
 
+    openai_api_key: str | None = None
+    openai_base_url: str | None = None
+    openai_chat_model: str = "gpt-4o-mini"
+    openai_embedding_model: str = "text-embedding-3-small"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
