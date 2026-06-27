@@ -28,7 +28,7 @@ def health():
 
 @app.get("/ai/test")
 def ai_test(q: str = "Hello AI"):
-    provider = get_ai_provider("dummy")
+    provider = get_ai_provider()
 
     answer = provider.chat([
         {"role": "user", "content": q}
