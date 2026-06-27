@@ -5,10 +5,8 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:8010:8000"
-    environment:
-      DATABASE_URL: postgresql+psycopg://nemo_ai:nemo_ai_password@postgres:5432/nemo_ai
-      DEFAULT_AI_PROVIDER: dummy
-      ENVIRONMENT: production
+    env_file:
+      - .env
     depends_on:
       - postgres
 
