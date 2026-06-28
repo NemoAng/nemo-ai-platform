@@ -35,6 +35,8 @@ from app.schemas.document import DocumentCreate, DocumentOut
 
 from app.ai.chunker import chunk_text
 
+from app.services.embedding_service import index_document_chunks
+
 app = FastAPI(title="Nemo AI Platform")
 
 
@@ -192,3 +194,7 @@ def get_document_chunks_api(document_id: int, db: Session = Depends(get_db)):
             for chunk in chunks
         ],
     }
+
+@app.post("/documents/{document_id}/index")
+def index_document_api(document_id: int, db: Session = Depends(get_db)):
+    return index_document_chunks(db, document_id)
