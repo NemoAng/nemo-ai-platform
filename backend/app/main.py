@@ -17,6 +17,14 @@ from app.ai.providers.exceptions import (
 
 from app.vectorstore.chroma import chroma_health
 
+from fastapi import Depends
+from sqlalchemy.orm import Session
+
+from app.db.deps import get_db
+from app.models.document import Document  # noqa: F401
+from app.repositories.document_repository import create_document, list_documents
+from app.schemas.document import DocumentCreate, DocumentOut
+
 app = FastAPI(title="Nemo AI Platform")
 
 
@@ -132,4 +140,13 @@ def vector_health():
         "vector_store": "chromadb",
         **result,
     }
+
+@app.post("/documents", response_model=DocumentOut)
+def create_document_api(data: DocumentCreate, db: Session = Depends(get_db)):
+    return create_document(db, data)
+
+
+@app.get("/documents", response_model=list[DocumentOut])
+def list_documents_api(db: Session = Depends(get_db)):
+    return list_documents(db)
 
