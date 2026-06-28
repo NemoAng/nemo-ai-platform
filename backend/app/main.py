@@ -37,6 +37,8 @@ from app.ai.chunker import chunk_text
 
 from app.services.embedding_service import index_document_chunks
 
+from app.services.search_service import semantic_search
+
 app = FastAPI(title="Nemo AI Platform")
 
 
@@ -198,3 +200,7 @@ def get_document_chunks_api(document_id: int, db: Session = Depends(get_db)):
 @app.post("/documents/{document_id}/index")
 def index_document_api(document_id: int, db: Session = Depends(get_db)):
     return index_document_chunks(db, document_id)
+
+@app.get("/search")
+def search_api(q: str, top_k: int = 5):
+    return semantic_search(q, top_k)
