@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     database_url: str
 
     default_ai_provider: str = "dummy"
+    chroma_host: str = "chromadb"
+    chroma_port: int = 8000
 
     openai_api_key: str | None = None
     openai_base_url: str | None = None

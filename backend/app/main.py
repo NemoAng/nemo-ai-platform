@@ -15,6 +15,8 @@ from app.ai.providers.exceptions import (
     AIProviderQuotaError,
 )
 
+from app.vectorstore.chroma import chroma_health
+
 app = FastAPI(title="Nemo AI Platform")
 
 
@@ -120,5 +122,14 @@ def ai_provider_health():
             "ok": embedding_ok,
             "error": embedding_error,
         },
+    }
+
+@app.get("/vector/health")
+def vector_health():
+    result = chroma_health()
+
+    return {
+        "vector_store": "chromadb",
+        **result,
     }
 
