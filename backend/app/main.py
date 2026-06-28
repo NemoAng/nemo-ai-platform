@@ -22,7 +22,15 @@ from sqlalchemy.orm import Session
 
 from app.db.deps import get_db
 from app.models.document import Document  # noqa: F401
-from app.repositories.document_repository import create_document, list_documents
+from app.models.document_chunk import DocumentChunk  # noqa: F401
+# from app.repositories.document_repository import create_document, list_documents, list_document_chunks
+from app.models.document_chunk import DocumentChunk  # noqa: F401
+from app.repositories.document_repository import (
+    create_document,
+    list_document_chunks,
+    list_documents,
+)
+
 from app.schemas.document import DocumentCreate, DocumentOut
 
 from app.ai.chunker import chunk_text
@@ -168,3 +176,19 @@ def chunk_test(data: DocumentCreate):
         ],
     }
 
+@app.get("/documents/{document_id}/chunks")
+def get_document_chunks_api(document_id: int, db: Session = Depends(get_db)):
+    chunks = list_document_chunks(db, document_id)
+
+    return {
+        "document_id": document_id,
+        "chunk_count": len(chunks),
+        "chunks": [
+            {
+                "id": chunk.id,
+                "chunk_index": chunk.chunk_index,
+                "content": chunk.content,
+            }
+            for chunk in chunks
+        ],
+    }

@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 
+from app.ai.chunker import chunk_text
 from app.models.document import Document
+from app.models.document_chunk import DocumentChunk
 from app.schemas.document import DocumentCreate
 
 
@@ -11,6 +13,19 @@ def create_document(db: Session, data: DocumentCreate) -> Document:
         source_type=data.source_type,
     )
     db.add(doc)
+    db.flush()
+
+    chunks = chunk_text(data.content)
+
+    for chunk in chunks:
+        db.add(
+            DocumentChunk(
+                document_id=doc.id,
+                chunk_index=chunk.index,
+                content=chunk.text,
+            )
+        )
+
     db.commit()
     db.refresh(doc)
     return doc
@@ -18,3 +33,12 @@ def create_document(db: Session, data: DocumentCreate) -> Document:
 
 def list_documents(db: Session) -> list[Document]:
     return db.query(Document).order_by(Document.id.desc()).all()
+
+
+def list_document_chunks(db: Session, document_id: int) -> list[DocumentChunk]:
+    return (
+        db.query(DocumentChunk)
+        .filter(DocumentChunk.document_id == document_id)
+        .order_by(DocumentChunk.chunk_index.asc())
+        .all()
+    )
