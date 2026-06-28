@@ -25,6 +25,8 @@ from app.models.document import Document  # noqa: F401
 from app.repositories.document_repository import create_document, list_documents
 from app.schemas.document import DocumentCreate, DocumentOut
 
+from app.ai.chunker import chunk_text
+
 app = FastAPI(title="Nemo AI Platform")
 
 
@@ -149,4 +151,20 @@ def create_document_api(data: DocumentCreate, db: Session = Depends(get_db)):
 @app.get("/documents", response_model=list[DocumentOut])
 def list_documents_api(db: Session = Depends(get_db)):
     return list_documents(db)
+
+@app.post("/documents/chunk-test")
+def chunk_test(data: DocumentCreate):
+    chunks = chunk_text(data.content)
+
+    return {
+        "title": data.title,
+        "chunk_count": len(chunks),
+        "chunks": [
+            {
+                "index": chunk.index,
+                "text": chunk.text,
+            }
+            for chunk in chunks
+        ],
+    }
 
