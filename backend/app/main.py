@@ -157,10 +157,18 @@ def vector_health():
         **result,
     }
 
-@app.post("/documents", response_model=DocumentOut)
+@app.post("/documents")
 def create_document_api(data: DocumentCreate, db: Session = Depends(get_db)):
-    return create_document(db, data)
+    doc = create_document(db, data)
+    index_result = index_document_chunks(db, doc.id)
 
+    return {
+        "id": doc.id,
+        "title": doc.title,
+        "source_type": doc.source_type,
+        "indexed": True,
+        "index_result": index_result,
+    }
 
 @app.get("/documents", response_model=list[DocumentOut])
 def list_documents_api(db: Session = Depends(get_db)):
