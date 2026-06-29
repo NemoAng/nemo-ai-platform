@@ -119,7 +119,7 @@ function App() {
       {answer && (
         <section>
           <h2>Answer</h2>
-          <p>{answer.answer}</p>
+          <p className="answer">{answer.answer}</p>
 
           <h3>Sources</h3>
           <pre>{JSON.stringify(answer.sources, null, 2)}</pre>
