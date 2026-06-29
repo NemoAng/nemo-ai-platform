@@ -39,6 +39,8 @@ from app.services.embedding_service import index_document_chunks
 
 from app.services.search_service import semantic_search
 
+from app.services.rag_service import ask_ai
+
 app = FastAPI(title="Nemo AI Platform")
 
 
@@ -204,3 +206,7 @@ def index_document_api(document_id: int, db: Session = Depends(get_db)):
 @app.get("/search")
 def search_api(q: str, top_k: int = 5):
     return semantic_search(q, top_k)
+
+@app.get("/ask")
+def ask_api(q: str, top_k: int = 5):
+    return ask_ai(q, top_k)
