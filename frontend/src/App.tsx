@@ -12,13 +12,13 @@ import type {
   VectorHealth,
 } from "./types/api";
 
+import { askAI as askAIRequest } from "./services/ai";
+import { createDocument } from "./services/document";
 import {
-  askAI as askAIRequest,
-  createDocument,
   getBackendHealth,
   getProviderHealth,
   getVectorHealth,
-} from "./services/api";
+} from "./services/health";
 
 function App() {
   const [backend, setBackend] = useState<BackendHealth | null>(null);
