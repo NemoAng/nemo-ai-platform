@@ -5,6 +5,7 @@ import { HealthCards } from "../components/HealthCards";
 import type {
   AskResult,
   BackendHealth,
+  DocumentItem,
   ProviderHealth,
   VectorHealth,
 } from "../types/api";
@@ -13,6 +14,8 @@ type Props = {
   backend: BackendHealth | null;
   provider: ProviderHealth | null;
   vector: VectorHealth | null;
+
+  documents: DocumentItem[];
 
   title: string;
   content: string;
@@ -23,6 +26,7 @@ type Props = {
   onTitleChange: (value: string) => void;
   onContentChange: (value: string) => void;
   onQuestionChange: (value: string) => void;
+
   onSaveDocument: () => void;
   onAskAI: () => void;
 };
@@ -31,23 +35,33 @@ export function Dashboard({
   backend,
   provider,
   vector,
+
+  documents,
+
   title,
   content,
   question,
   answer,
   status,
+
   onTitleChange,
   onContentChange,
   onQuestionChange,
+
   onSaveDocument,
   onAskAI,
 }: Props) {
   return (
     <>
-      <HealthCards backend={backend} provider={provider} vector={vector} />
+      <HealthCards
+        backend={backend}
+        provider={provider}
+        vector={vector}
+      />
 
       <section className="workspace">
         <DocumentPanel
+          documents={documents}
           title={title}
           content={content}
           onTitleChange={onTitleChange}

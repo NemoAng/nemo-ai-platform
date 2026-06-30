@@ -29,3 +29,9 @@ export type AskResult = {
     content_preview: string;
   }[];
 };
+
+export type DocumentItem = {
+  id: number;
+  title: string;
+  source_type: string;
+};

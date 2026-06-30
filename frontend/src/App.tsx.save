@@ -1,31 +1,32 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
-import { askAI as askAIRequest } from "./services/ai";
-import { createDocument, listDocuments } from "./services/document";
-import {
-  getBackendHealth,
-  getProviderHealth,
-  getVectorHealth,
-} from "./services/health";
-
-import { Dashboard } from "./pages/Dashboard";
+# import { AskPanel } from "./components/AskPanel";
+import { DocumentPanel } from "./components/DocumentPanel";
+import { HealthCards } from "./components/HealthCards";
 import { Sidebar } from "./components/Sidebar";
 import { Topbar } from "./components/Topbar";
+import { Dashboard } from "./pages/Dashboard";
 
 import type {
   AskResult,
   BackendHealth,
-  DocumentItem,
   ProviderHealth,
   VectorHealth,
 } from "./types/api";
+
+import {
+  askAI as askAIRequest,
+  createDocument,
+  getBackendHealth,
+  getProviderHealth,
+  getVectorHealth,
+} from "./services/api";
 
 function App() {
   const [backend, setBackend] = useState<BackendHealth | null>(null);
   const [provider, setProvider] = useState<ProviderHealth | null>(null);
   const [vector, setVector] = useState<VectorHealth | null>(null);
-  const [documents, setDocuments] = useState<DocumentItem[]>([]);
 
   const [title, setTitle] = useState("RAG Demo");
   const [content, setContent] = useState("");
@@ -37,7 +38,6 @@ function App() {
     getBackendHealth().then(setBackend);
     getProviderHealth().then(setProvider);
     getVectorHealth().then(setVector);
-    listDocuments().then(setDocuments);
   }, []);
 
   async function addDocument() {
@@ -46,9 +46,6 @@ function App() {
     try {
       const data = await createDocument(title, content);
       setStatus(`Document saved and indexed. ID: ${data.id}`);
-
-      const docs = await listDocuments();
-      setDocuments(docs);
     } catch (err) {
       setStatus(`Document error: ${(err as Error).message}`);
     }
@@ -73,22 +70,25 @@ function App() {
       <main className="main">
         <Topbar />
 
-        <Dashboard
-          backend={backend}
-          provider={provider}
-          vector={vector}
-          documents={documents}
-          title={title}
-          content={content}
-          question={question}
-          answer={answer}
-          status={status}
-          onTitleChange={setTitle}
-          onContentChange={setContent}
-          onQuestionChange={setQuestion}
-          onSaveDocument={addDocument}
-          onAskAI={askAI}
-        />
+        <HealthCards backend={backend} provider={provider} vector={vector} />
+
+        <section className="workspace">
+          <DocumentPanel
+            title={title}
+            content={content}
+            onTitleChange={setTitle}
+            onContentChange={setContent}
+            onSave={addDocument}
+          />
+
+          <AskPanel
+            question={question}
+            answer={answer}
+            status={status}
+            onQuestionChange={setQuestion}
+            onAsk={askAI}
+          />
+        </section>
       </main>
     </div>
   );

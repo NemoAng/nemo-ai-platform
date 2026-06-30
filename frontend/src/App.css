@@ -18,7 +18,8 @@ html,
 body,
 #root {
   margin: 0;
-  height: 100%;
+  width: 100%;
+  min-height: 100vh;
   background: var(--bg);
   color: var(--text);
   font-family:
@@ -28,23 +29,41 @@ body,
     sans-serif;
 }
 
+body {
+  overflow-x: hidden;
+}
+
 a {
   text-decoration: none;
 }
+
+/* ==============================
+   Layout
+============================== */
 
 .app-shell {
   display: flex;
   min-height: 100vh;
 }
 
-/* ---------------- Sidebar ---------------- */
-
 .sidebar {
   width: 250px;
   background: #0b0f14;
   border-right: 1px solid var(--border);
   padding: 24px;
+  flex-shrink: 0;
 }
+
+.main {
+  flex: 1;
+  width: calc(100vw - 250px);
+  padding: 32px;
+  overflow-x: hidden;
+}
+
+/* ==============================
+   Brand
+============================== */
 
 .brand {
   display: flex;
@@ -75,6 +94,10 @@ a {
   font-size: 13px;
 }
 
+/* ==============================
+   Sidebar
+============================== */
+
 .sidebar nav {
   display: flex;
   flex-direction: column;
@@ -99,15 +122,9 @@ a {
   color: white;
 }
 
-/* ---------------- Main ---------------- */
-
-.main {
-  flex: 1;
-  width: calc(100vw - 250px);
-  min-height: 100vh;
-  padding: 32px;
-  overflow-x: hidden;
-}
+/* ==============================
+   Header
+============================== */
 
 .topbar {
   display: flex;
@@ -132,7 +149,9 @@ a {
   border-radius: 100px;
 }
 
-/* ---------------- Cards ---------------- */
+/* ==============================
+   Cards
+============================== */
 
 .cards {
   display: grid;
@@ -167,7 +186,9 @@ a {
   margin-top: 16px;
 }
 
-/* ---------------- Workspace ---------------- */
+/* ==============================
+   Workspace
+============================== */
 
 .workspace {
   display: grid;
@@ -175,7 +196,6 @@ a {
   gap: 24px;
   width: 100%;
   margin-top: 30px;
-  align-items: stretch;
 }
 
 .panel {
@@ -185,7 +205,7 @@ a {
   padding: 24px;
   display: flex;
   flex-direction: column;
-  min-height: 680px;
+  min-height: 700px;
 }
 
 .panel-header {
@@ -199,7 +219,9 @@ a {
   font-size: 13px;
 }
 
-/* ---------------- Inputs ---------------- */
+/* ==============================
+   Inputs
+============================== */
 
 input,
 textarea {
@@ -210,14 +232,16 @@ textarea {
   color: white;
   border: 1px solid var(--border);
   border-radius: 10px;
-  resize: vertical;
 }
 
 textarea {
-  min-height: 240px;
+  min-height: 220px;
+  resize: vertical;
 }
 
-/* ---------------- Buttons ---------------- */
+/* ==============================
+   Buttons
+============================== */
 
 button {
   background: var(--green);
@@ -227,27 +251,29 @@ button {
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
-  transition: .2s;
 }
 
 button:hover {
-  transform: translateY(-1px);
   opacity: .95;
 }
 
-/* ---------------- Status ---------------- */
+/* ==============================
+   Status
+============================== */
 
 .status {
-  margin-top: 18px;
+  margin-top: 20px;
   color: #7ee787;
 }
 
-/* ---------------- Chat ---------------- */
+/* ==============================
+   Chat
+============================== */
 
 .answer-box {
   flex: 1;
-  margin-top: 24px;
   overflow-y: auto;
+  margin-top: 24px;
 }
 
 .message {
@@ -269,6 +295,10 @@ button:hover {
   line-height: 1.7;
 }
 
+/* ==============================
+   Sources
+============================== */
+
 .sources {
   margin-top: 24px;
 }
@@ -283,10 +313,51 @@ button:hover {
 
 .source p {
   color: var(--subtext);
-  margin-top: 8px;
 }
 
-/* ---------------- Status Dot ---------------- */
+/* ==============================
+   Documents
+============================== */
+
+.document-list {
+  margin-top: 28px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+.document-list h3 {
+  margin-top: 0;
+}
+
+.document-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #11161d;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.document-item span {
+  display: block;
+  color: var(--subtext);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.document-item small {
+  color: var(--subtext);
+}
+
+.muted {
+  color: var(--subtext);
+}
+
+/* ==============================
+   Status Dot
+============================== */
 
 .dot {
   width: 12px;
@@ -303,20 +374,23 @@ button:hover {
   background: #f85149;
 }
 
-/* ---------------- Responsive ---------------- */
+/* ==============================
+   Responsive
+============================== */
 
 @media (max-width: 1100px) {
-
-  .cards,
-  .workspace {
-    grid-template-columns: 1fr;
-  }
 
   .sidebar {
     display: none;
   }
 
   .main {
+    width: 100%;
     padding: 20px;
+  }
+
+  .cards,
+  .workspace {
+    grid-template-columns: 1fr;
   }
 }

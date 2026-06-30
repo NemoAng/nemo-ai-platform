@@ -1,3 +1,4 @@
+import type { DocumentItem } from "../types/api";
 import { requestJson } from "./client";
 
 export function createDocument(title: string, content: string) {
@@ -15,4 +16,8 @@ export function createDocument(title: string, content: string) {
       }),
     }
   );
+}
+
+export function listDocuments() {
+  return requestJson<DocumentItem[]>("/documents");
 }
