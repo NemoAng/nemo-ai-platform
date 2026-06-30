@@ -14,6 +14,14 @@ import type {
   VectorHealth,
 } from "./types/api";
 
+import {
+  askAI as askAIRequest,
+  createDocument,
+  getBackendHealth,
+  getProviderHealth,
+  getVectorHealth,
+} from "./services/api";
+
 function App() {
   const [backend, setBackend] = useState<BackendHealth | null>(null);
   const [provider, setProvider] = useState<ProviderHealth | null>(null);
@@ -26,50 +34,32 @@ function App() {
   const [status, setStatus] = useState("");
 
   useEffect(() => {
-    fetch("/ai-api/health").then((r) => r.json()).then(setBackend);
-    fetch("/ai-api/ai/provider/health").then((r) => r.json()).then(setProvider);
-    fetch("/ai-api/vector/health").then((r) => r.json()).then(setVector);
+    getBackendHealth().then(setBackend);
+    getProviderHealth().then(setProvider);
+    getVectorHealth().then(setVector);
   }, []);
 
   async function addDocument() {
     setStatus("Saving and indexing document...");
 
-    const res = await fetch("/ai-api/documents", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title,
-        content,
-        source_type: "text",
-      }),
-    });
-
-    if (!res.ok) {
-      setStatus(`Document error: HTTP ${res.status}`);
-      return;
+    try {
+      const data = await createDocument(title, content);
+      setStatus(`Document saved and indexed. ID: ${data.id}`);
+    } catch (err) {
+      setStatus(`Document error: ${(err as Error).message}`);
     }
-
-    const data = await res.json();
-    setStatus(`Document saved and indexed. ID: ${data.id}`);
   }
 
   async function askAI() {
     setStatus("Asking AI...");
 
-    const res = await fetch(
-      `/ai-api/ask?q=${encodeURIComponent(question)}&top_k=3`
-    );
-
-    if (!res.ok) {
-      setStatus(`Ask error: HTTP ${res.status}`);
-      return;
+    try {
+      const data = await askAIRequest(question, 3);
+      setAnswer(data);
+      setStatus("Answer received.");
+    } catch (err) {
+      setStatus(`Ask error: ${(err as Error).message}`);
     }
-
-    const data = await res.json();
-    setAnswer(data);
-    setStatus("Answer received.");
   }
 
   return (
