@@ -1,10 +1,28 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
-type Health = {
+type BackendHealth = {
   status: string;
   service: string;
   database?: string;
+};
+
+type ProviderHealth = {
+  provider: string;
+  chat: {
+    ok: boolean;
+    error: string | null;
+  };
+  embedding: {
+    ok: boolean;
+    error: string | null;
+  };
+};
+
+type VectorHealth = {
+  vector_store: string;
+  status: string;
+  heartbeat?: number;
 };
 
 type AskResult = {
@@ -22,7 +40,9 @@ type AskResult = {
 };
 
 function App() {
-  const [health, setHealth] = useState<Health | null>(null);
+  const [health, setHealth] = useState<BackendHealth | null>(null);
+  const [providerHealth, setProviderHealth] = useState<ProviderHealth | null>(null);
+  const [vectorHealth, setVectorHealth] = useState<VectorHealth | null>(null);
 
   const [title, setTitle] = useState("RAG Demo");
   const [content, setContent] = useState("");
@@ -35,6 +55,16 @@ function App() {
       .then((res) => res.json())
       .then(setHealth)
       .catch((err) => setStatus(`Health error: ${err.message}`));
+
+    fetch("/ai-api/ai/provider/health")
+      .then((res) => res.json())
+      .then(setProviderHealth)
+      .catch((err) => setStatus(`Provider health error: ${err.message}`));
+
+    fetch("/ai-api/vector/health")
+      .then((res) => res.json())
+      .then(setVectorHealth)
+      .catch((err) => setStatus(`Vector health error: ${err.message}`));
   }, []);
 
   async function addDocument() {
@@ -84,8 +114,16 @@ function App() {
       <p>Self-hosted AI platform for RAG, documents, media, and agents.</p>
 
       <section>
-        <h2>Backend Health</h2>
+        <h2>System Dashboard</h2>
+
+        <h3>Backend</h3>
         <pre>{health ? JSON.stringify(health, null, 2) : "Loading..."}</pre>
+
+        <h3>AI Provider</h3>
+        <pre>{providerHealth ? JSON.stringify(providerHealth, null, 2) : "Loading..."}</pre>
+
+        <h3>Vector Store</h3>
+        <pre>{vectorHealth ? JSON.stringify(vectorHealth, null, 2) : "Loading..."}</pre>
       </section>
 
       <section>
