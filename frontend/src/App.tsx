@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
-import { AskPanel } from "./components/AskPanel";
-import { DocumentPanel } from "./components/DocumentPanel";
-import { HealthCards } from "./components/HealthCards";
 import { Sidebar } from "./components/Sidebar";
 import { Topbar } from "./components/Topbar";
+import { Dashboard } from "./pages/Dashboard";
 
 import type {
   AskResult,
@@ -69,25 +67,21 @@ function App() {
       <main className="main">
         <Topbar />
 
-        <HealthCards backend={backend} provider={provider} vector={vector} />
-
-        <section className="workspace">
-          <DocumentPanel
-            title={title}
-            content={content}
-            onTitleChange={setTitle}
-            onContentChange={setContent}
-            onSave={addDocument}
-          />
-
-          <AskPanel
-            question={question}
-            answer={answer}
-            status={status}
-            onQuestionChange={setQuestion}
-            onAsk={askAI}
-          />
-        </section>
+		<Dashboard
+		  backend={backend}
+		  provider={provider}
+		  vector={vector}
+		  title={title}
+		  content={content}
+		  question={question}
+		  answer={answer}
+		  status={status}
+		  onTitleChange={setTitle}
+		  onContentChange={setContent}
+		  onQuestionChange={setQuestion}
+		  onSaveDocument={addDocument}
+		  onAskAI={askAI}
+		/>
       </main>
     </div>
   );
