@@ -1,59 +1,322 @@
 :root {
-  font-family: Arial, Helvetica, sans-serif;
-  color: #172033;
-  background: #f5f7fb;
+  --bg: #0d1117;
+  --panel: #161b22;
+  --panel2: #1f2630;
+  --border: #30363d;
+  --text: #e6edf3;
+  --subtext: #9da7b3;
+  --green: #2ea043;
+  --blue: #2f81f7;
+  --hover: #21262d;
 }
 
-body {
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    Inter,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------------- Sidebar ---------------- */
+
+.sidebar {
+  width: 250px;
+  background: #0b0f14;
+  border-right: 1px solid var(--border);
+  padding: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.brand-mark {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--green);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  margin-right: 14px;
+  font-size: 20px;
+}
+
+.brand-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.brand-subtitle {
+  color: var(--subtext);
+  font-size: 13px;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar nav a {
+  color: var(--subtext);
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.sidebar nav a:hover {
+  background: var(--hover);
+  color: white;
+}
+
+.sidebar nav .active {
+  background: var(--blue);
+  color: white;
+}
+
+/* ---------------- Main ---------------- */
+
+.main {
+  flex: 1;
+  width: calc(100vw - 250px);
+  min-height: 100vh;
+  padding: 32px;
+  overflow-x: hidden;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 34px;
+}
+
+.topbar p {
+  margin-top: 6px;
+  color: var(--subtext);
+}
+
+.user-pill {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  border-radius: 100px;
+}
+
+/* ---------------- Cards ---------------- */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  gap: 24px;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px;
+}
+
+.card-label {
+  color: var(--subtext);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.card h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0;
 }
 
-main {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 32px;
+.card p {
+  color: var(--subtext);
+  margin-top: 16px;
 }
 
-h1 {
-  margin-bottom: 4px;
+/* ---------------- Workspace ---------------- */
+
+.workspace {
+  display: grid;
+  grid-template-columns: 420px minmax(0, 1fr);
+  gap: 24px;
+  width: 100%;
+  margin-top: 30px;
+  align-items: stretch;
 }
 
-section {
-  background: white;
-  border: 1px solid #e2e6ef;
-  border-radius: 12px;
-  padding: 20px;
-  margin: 20px 0;
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  min-height: 680px;
 }
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.panel-header span {
+  color: var(--subtext);
+  font-size: 13px;
+}
+
+/* ---------------- Inputs ---------------- */
 
 input,
 textarea {
   width: 100%;
-  box-sizing: border-box;
-  margin: 8px 0 12px;
-  padding: 12px;
-  border: 1px solid #cfd6e4;
-  border-radius: 8px;
-  font-size: 15px;
+  padding: 14px;
+  margin-bottom: 16px;
+  background: var(--panel2);
+  color: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  resize: vertical;
 }
+
+textarea {
+  min-height: 240px;
+}
+
+/* ---------------- Buttons ---------------- */
 
 button {
-  padding: 10px 16px;
-  border: 0;
-  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
+  transition: .2s;
 }
 
-pre {
-  background: #101827;
-  color: #e7edf7;
-  padding: 14px;
-  border-radius: 8px;
-  overflow: auto;
+button:hover {
+  transform: translateY(-1px);
+  opacity: .95;
 }
 
-.answer {
+/* ---------------- Status ---------------- */
+
+.status {
+  margin-top: 18px;
+  color: #7ee787;
+}
+
+/* ---------------- Chat ---------------- */
+
+.answer-box {
+  flex: 1;
+  margin-top: 24px;
+  overflow-y: auto;
+}
+
+.message {
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+}
+
+.user {
+  background: #1d2b43;
+}
+
+.ai {
+  background: #17361f;
+}
+
+.message p {
   white-space: pre-wrap;
-  line-height: 1.6;
+  line-height: 1.7;
+}
+
+.sources {
+  margin-top: 24px;
+}
+
+.source {
+  background: #11161d;
+  border-left: 4px solid var(--green);
+  padding: 14px;
+  border-radius: 10px;
+  margin-top: 12px;
+}
+
+.source p {
+  color: var(--subtext);
+  margin-top: 8px;
+}
+
+/* ---------------- Status Dot ---------------- */
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ok {
+  background: #2ea043;
+}
+
+.bad {
+  background: #f85149;
+}
+
+/* ---------------- Responsive ---------------- */
+
+@media (max-width: 1100px) {
+
+  .cards,
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .main {
+    padding: 20px;
+  }
 }
