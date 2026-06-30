@@ -66,7 +66,7 @@ function App() {
 
       <main className="main">
         <Topbar />
-<p>WWWWWWW</p>
+
 		<Dashboard
 		  backend={backend}
 		  provider={provider}
