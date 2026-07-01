@@ -1,82 +1,87 @@
-import { AskPanel } from "../components/AskPanel";
-import { DocumentPanel } from "../components/DocumentPanel";
-import { HealthCards } from "../components/HealthCards";
+import { useEffect, useState } from "react";
+
+import {
+  getBackendHealth,
+  getProviderHealth,
+  getVectorHealth,
+} from "../services/health";
+import { listDocuments } from "../services/document";
 
 import type {
-  AskResult,
   BackendHealth,
-  DocumentItem,
   ProviderHealth,
   VectorHealth,
+  DocumentItem,
 } from "../types/api";
 
-type Props = {
-  backend: BackendHealth | null;
-  provider: ProviderHealth | null;
-  vector: VectorHealth | null;
+export function Dashboard() {
+  const [backend, setBackend] = useState<BackendHealth | null>(null);
+  const [provider, setProvider] = useState<ProviderHealth | null>(null);
+  const [vector, setVector] = useState<VectorHealth | null>(null);
+  const [documents, setDocuments] = useState<DocumentItem[]>([]);
 
-  documents: DocumentItem[];
+  // 🔥 实时刷新（每 5 秒）
+  useEffect(() => {
+    const load = () => {
+      getBackendHealth().then(setBackend);
+      getProviderHealth().then(setProvider);
+      getVectorHealth().then(setVector);
+      listDocuments().then(setDocuments);
+    };
 
-  title: string;
-  content: string;
-  question: string;
-  answer: AskResult | null;
-  status: string;
+    load();
+    const timer = setInterval(load, 5000);
 
-  onTitleChange: (value: string) => void;
-  onContentChange: (value: string) => void;
-  onQuestionChange: (value: string) => void;
+    return () => clearInterval(timer);
+  }, []);
 
-  onSaveDocument: () => void;
-  onAskAI: () => void;
-};
-
-export function Dashboard({
-  backend,
-  provider,
-  vector,
-
-  documents,
-
-  title,
-  content,
-  question,
-  answer,
-  status,
-
-  onTitleChange,
-  onContentChange,
-  onQuestionChange,
-
-  onSaveDocument,
-  onAskAI,
-}: Props) {
   return (
-    <>
-      <HealthCards
-        backend={backend}
-        provider={provider}
-        vector={vector}
-      />
+    <div className="page">
+      <div className="card-grid">
+        {/* Backend */}
+        <div className="card">
+          <div className="card-title">Backend</div>
+          <div className="card-value">
+            <span className="status-dot" />
+            {backend ? "FastAPI" : "Loading..."}
+          </div>
+          <div className="card-sub">
+            {backend ? "Database: ok" : "Checking..."}
+          </div>
+        </div>
 
-      <section className="workspace">
-        <DocumentPanel
-          documents={documents}
-          title={title}
-          content={content}
-          onTitleChange={onTitleChange}
-          onContentChange={onContentChange}
-          onSave={onSaveDocument}
-        />
+        {/* Provider */}
+        <div className="card">
+          <div className="card-title">AI Provider</div>
+          <div className="card-value">
+            <span className="status-dot" />
+            {provider ? provider.provider : "Loading..."}
+          </div>
+          <div className="card-sub">
+            {provider
+              ? `Chat: ${provider.chat.ok ? "Online" : "Offline"} · Embedding: ${
+                  provider.embedding.ok ? "Online" : "Offline"
+                }`
+              : "Checking..."}
+          </div>
+        </div>
 
-        <AskPanel
-          question={question}
-          answer={answer}
-          status={status}
-          onQuestionChange={onQuestionChange}
-          onAsk={onAskAI}
-        />
-      </section>
-    </>
+        {/* Vector */}
+        <div className="card">
+          <div className="card-title">Vector Store</div>
+          <div className="card-value">
+            <span className="status-dot" />
+            chromadb
+          </div>
+          <div className="card-sub">
+            {vector ? `Heartbeat: ${vector.heartbeat}` : "Checking..."}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: "30px" }}>
+        <h2>Documents ({documents.length})</h2>
+      </div>
+    </div>
   );
 }

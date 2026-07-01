@@ -1,13 +1,5 @@
 import { NavLink } from "react-router-dom";
 
-const navItems = [
-  { label: "Dashboard", path: "/" },
-  { label: "AI Chat", path: "/chat" },
-  { label: "Documents", path: "/documents" },
-  { label: "Search", path: "/search" },
-  { label: "Settings", path: "/settings" },
-];
-
 export function Sidebar() {
   return (
     <aside className="sidebar">
@@ -20,16 +12,11 @@ export function Sidebar() {
       </div>
 
       <nav>
-        {navItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            end={item.path === "/"}
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            {item.label}
-          </NavLink>
-        ))}
+        <NavLink to="/dashboard">Dashboard</NavLink>
+        <NavLink to="/chat">AI Chat</NavLink>
+        <NavLink to="/documents">Documents</NavLink>
+        <NavLink to="/search">Search</NavLink>
+        <NavLink to="/settings">Settings</NavLink>
       </nav>
     </aside>
   );
