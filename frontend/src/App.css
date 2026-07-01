@@ -23,7 +23,7 @@ body,
   background: var(--bg);
   color: var(--text);
   font-family: "Courier New", Courier, monospace;
-  font-size: 16px;
+  font-size: 20px;
   line-height: 1.6;
 }
 
@@ -45,21 +45,6 @@ h1 {
 
 h2 {
   font-size: 20px;
-}
-
-/* 卡片标题 */
-.card-title {
-  font-size: 14px;
-}
-
-/* 卡片主内容 */
-.card-value {
-  font-size: 18px;
-}
-
-/* 次级信息 */
-.card-sub {
-  font-size: 13px;
 }
 
 /* ==============================
@@ -110,13 +95,13 @@ h2 {
 }
 
 .brand-title {
-  font-size: 20px;
+  font-size: 28px;
   font-weight: 700;
 }
 
 .brand-subtitle {
   color: var(--subtext);
-  font-size: 13px;
+  font-size: 17px;
 }
 
 /* ==============================
@@ -241,7 +226,7 @@ h2 {
 
 .panel-header span {
   color: var(--subtext);
-  font-size: 13px;
+  font-size: 22px;
 }
 
 /* ==============================
@@ -258,7 +243,7 @@ textarea {
   border: 1px solid var(--border);
   border-radius: 10px;
   font-family: "Courier New", Courier, monospace;
-  font-size: 15px;
+  font-size: 20px;
 }
 
 textarea {
@@ -278,6 +263,7 @@ button {
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
+  font-size:20px;
 }
 
 button:hover {
@@ -428,6 +414,12 @@ button:hover {
   margin-bottom: 24px;
 }
 
+.page button {
+  display: block;
+  margin-left: auto;
+  margin-bottom: 16px;
+}
+
 .documents-layout {
   display: grid;
   grid-template-columns: 420px minmax(0, 1fr);
@@ -462,7 +454,7 @@ button:hover {
 
 .upload-subtitle {
   color: var(--subtext);
-  font-size: 14px;
+  font-size: 18px;
 }
 
 .document-list.standalone {
@@ -498,15 +490,28 @@ button:hover {
 }
 
 .chat-input-bar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   gap: 14px;
-  align-items: start;
-  margin-top: 20px;
+  align-items: stretch;
 }
 
 .chat-input-bar textarea {
+  flex: 1;
   min-height: 120px;
+}
+
+
+
+.chat-input-row {
+  display: grid;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.chat-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .source-meta {
@@ -526,6 +531,10 @@ button:hover {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 14px;
   margin-top: 24px;
+}
+
+.search-bar input{
+  font-size: 20px;
 }
 
 .search-results {
@@ -685,7 +694,7 @@ button:hover {
   padding: 10px;
   color: #c9d1d9;
   text-decoration: none;
-  font-size: 15px;
+  font-size: 20px;
 }
 
 .sidebar a.active {
@@ -708,26 +717,27 @@ button:hover {
 }
 
 .card-title {
-  font-size: 14px;
+  font-size: 16px;
   color: #8b949e;
 }
 
 .card-value {
-  font-size: 20px;
+  font-size: 22px;
   margin-top: 8px;
   font-weight: bold;
+  text-transform: capitalize;
 }
 
 .card-sub {
-  margin-top: 6px;
+  margin-top: 16px;
   color: #8b949e;
 }
 
 .status-dot {
   display: inline-block;
-  width: 10px;
-  height: 10px;
-  background: #3fb950;
+  width: 13px;
+  height: 13px;
+  background: #34f04e;
   border-radius: 50%;
   margin-right: 8px;
 

@@ -1,90 +1,129 @@
 # 🚀 Nemo AI Platform
 
-Production-ready Retrieval-Augmented Generation (RAG) system with hybrid
-AI architecture.
+> Self-hosted AI workspace for documents, RAG, local LLM, and semantic search.
 
-🌐 Live: https://www.nemowang.dpdns.org/ai/
+---
 
-------------------------------------------------------------------------
+## ✨ Features
 
-## ✨ Highlights
+### 🧠 AI Chat (RAG)
+- Multi-turn conversation with context memory
+- Retrieval-Augmented Generation (RAG)
+- Citation support `[1][2]`
+- Markdown rendering
+- Local LLM via Ollama (phi3 / llama3 / mistral)
 
--   🔁 **Multi-provider AI**: Gemini (primary) + **Ollama (phi3)
-    fallback**
--   🧠 **RAG pipeline**: chunking → embeddings → vector search →
-    grounded answers
--   📄 **PDF ingestion**: upload & auto-index
--   💬 **Chat with memory**: multi-turn + citations
--   🧩 **Provider decoupling**: Chat vs Embedding split for stability
--   🐳 **Dockerized**: one-command deploy
+---
 
-------------------------------------------------------------------------
+### 📄 Documents
+- Upload PDF (auto extract + embed + index)
+- Add text documents manually
+- Delete documents
+- Vector storage with ChromaDB
+
+---
+
+### 🔍 Semantic Search
+- Search across indexed documents
+- Embedding-based retrieval
+- Fast similarity search
+
+---
+
+### ⚙️ System Dashboard
+- Backend health (FastAPI)
+- AI provider status (Ollama / Gemini / OpenAI)
+- Vector DB heartbeat (ChromaDB)
+
+---
 
 ## 🧱 Architecture
 
-Frontend (React + TS + Vite) ↓ FastAPI Backend ↓ RAG Pipeline ├──
-Chunking ├── Embedding (Gemini) ├── Vector DB (ChromaDB) └── Retrieval ↓
-Chat Provider ├── Gemini (primary) └── Ollama (fallback: phi3) ↓
+Frontend (React + Vite)
+        ↓
+FastAPI Backend
+        ↓
+AI Provider Layer
+   ├── Ollama (local LLM)
+   ├── Gemini / OpenAI (optional)
+        ↓
+Vector Store (ChromaDB)
+        ↓
 PostgreSQL (metadata)
 
-------------------------------------------------------------------------
+---
 
-## 🛠 Tech Stack
+## 🖥️ Screenshots
 
-**Frontend** - React, TypeScript, Vite, React Router
+### Dashboard
+![Dashboard](./docs/dashboard.png)
 
-**Backend** - FastAPI, SQLAlchemy, Pydantic
+### AI Chat
+![Chat](./docs/chat.png)
 
-**AI / RAG** - Gemini (chat + embeddings) - Ollama (local LLM: phi3) -
-ChromaDB (vector store)
+### Documents
+![Documents](./docs/documents.png)
 
-**Infra** - Docker Compose, Nginx, VPS
+### Search
+![Search](./docs/search.png)
 
-------------------------------------------------------------------------
+---
 
-## ⚙️ Run
+## ⚙️ Tech Stack
 
-``` bash
+- Frontend: React + TypeScript + Vite
+- Backend: FastAPI + Python
+- Database: PostgreSQL
+- Vector DB: ChromaDB
+- LLM: Ollama (phi3 / llama3 / mistral)
+- Deployment: Docker + Nginx
+
+---
+
+## 🚀 Quick Start
+
+### Clone
+
+git clone https://github.com/yourname/nemo-ai-platform.git
+cd nemo-ai-platform
+
+### Start backend
+
 docker compose up -d --build
-```
 
-Frontend:
+### Start frontend
 
-``` bash
 cd frontend
 npm install
 npm run build
-cd ..
+
+### Deploy frontend
+
 ./scripts/deploy_frontend.sh
-```
 
-------------------------------------------------------------------------
+---
 
-## 🔁 AI Strategy
+## 🤖 AI Provider
 
--   **Chat**: Gemini → fallback to Ollama (phi3) on quota/limits
--   **Embedding**: Gemini (stable, fast)
--   Ensures **availability** and **cost control**
+Use Ollama:
 
-------------------------------------------------------------------------
+ollama run phi3
 
-## 📸 Screens
+.env:
 
--   Dashboard (health)
--   Chat (RAG + citations)
--   Documents (PDF upload/index)
--   Search (semantic)
+DEFAULT_AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://host.docker.internal:11434
+OLLAMA_CHAT_MODEL=phi3
 
-------------------------------------------------------------------------
+---
 
-## 🧑‍💻 Author
+## 👤 Author
 
-Nemo Wang\
-LinkedIn: https://www.linkedin.com/in/nemo-wang/ \
-GitHub: https://github.com/NemoAng/
+Nemo Wang
 
-------------------------------------------------------------------------
+GitHub: https://github.com/NemoAng  
+LinkedIn: https://www.linkedin.com/in/nemo-wang/
 
-## 📄 License
+---
 
-MIT
+## ⭐ Star if useful!

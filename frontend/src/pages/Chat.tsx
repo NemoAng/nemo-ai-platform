@@ -66,11 +66,10 @@ export default function Chat() {
   return (
     <div className="page">
       <h1>AI Chat</h1>
-
+	  <button onClick={clearChat}>Clear</button>
       <div className="chat-page">
 
         <div className="chat-history">
-
           {messages.length === 0 && (
             <div className="empty-state">
               Start a conversation.
@@ -106,20 +105,19 @@ export default function Chat() {
           )}
         </div>
 
-        <div className="chat-toolbar">
-          <button onClick={clearChat}>Clear</button>
-        </div>
 
-        <div className="chat-input-bar">
+
+        <div className="chat-input-row">
           <textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
           />
-
-          <button disabled={loading} onClick={send}>
-            {loading ? "Thinking..." : "Send"}
-          </button>
         </div>
+		  <div className="chat-buttons">
+			  <button disabled={loading} onClick={send}>
+				{loading ? "Thinking..." : "Send"}
+			  </button>
+		  </div>
       </div>
     </div>
   );

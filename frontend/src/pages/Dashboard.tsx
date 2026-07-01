@@ -46,7 +46,7 @@ export function Dashboard() {
             {backend ? "FastAPI" : "Loading..."}
           </div>
           <div className="card-sub">
-            {backend ? "Database: ok" : "Checking..."}
+            {backend ? "Database: OK" : "Checking..."}
           </div>
         </div>
 
@@ -71,7 +71,7 @@ export function Dashboard() {
           <div className="card-title">Vector Store</div>
           <div className="card-value">
             <span className="status-dot" />
-            chromadb
+            ChromaDB
           </div>
           <div className="card-sub">
             {vector ? `Heartbeat: ${vector.heartbeat}` : "Checking..."}

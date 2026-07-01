@@ -68,7 +68,7 @@ export default function Settings() {
         <section className="panel settings-panel">
           <div className="panel-header">
             <h2>Backend</h2>
-            <span>{backend?.status ?? "Loading"}</span>
+            <span>{backend?.status.toUpperCase() ?? "Loading"}</span>
           </div>
 
           <div className="settings-row">
@@ -85,7 +85,7 @@ export default function Settings() {
         <section className="panel settings-panel">
           <div className="panel-header">
             <h2>Vector Store</h2>
-            <span>{vector?.status ?? "Loading"}</span>
+            <span>{vector?.status.toUpperCase() ?? "Loading"}</span>
           </div>
 
           <div className="settings-row">

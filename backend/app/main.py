@@ -82,9 +82,9 @@ def health():
         db_result = conn.execute(text("SELECT 1")).scalar()
 
     return {
-        "status": "ok",
+        "status": "OK",
         "service": "nemo-ai-platform-backend",
-        "database": "ok" if db_result == 1 else "error",
+        "database": "OK" if db_result == 1 else "Error",
     }
 
 
@@ -149,7 +149,7 @@ def vector_health():
     result = chroma_health()
 
     return {
-        "vector_store": "chromadb",
+        "vector_store": "ChromaDB",
         **result,
     }
 

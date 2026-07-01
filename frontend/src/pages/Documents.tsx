@@ -16,6 +16,7 @@ export default function Documents() {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [status, setStatus] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   async function refresh() {
     try {
@@ -66,6 +67,7 @@ export default function Documents() {
     try {
       await uploadPdf(file);
       await refresh();
+	  setSelectedFile(null);
       setStatus("PDF indexed successfully.");
     } catch (err) {
       setStatus((err as Error).message);
@@ -107,12 +109,21 @@ export default function Documents() {
             <span>Extract text + embed + index</span>
           </div>
 
+		 {selectedFile && (
+		   <div className="upload-filename">
+			 Selected: {selectedFile.name}
+		   </div>
+		 )}
+
           <label className="upload-box">
             <input
               type="file"
               accept="application/pdf"
               disabled={uploading}
-              onChange={(e) => handlePdfUpload(e.target.files?.[0] ?? null)}
+				onChange={(e) => {
+				  const file = e.target.files?.[0];
+				  if (file) setSelectedFile(file);
+				}}
             />
             <div className="upload-title">
               {uploading ? "Uploading..." : "Choose PDF"}
@@ -120,6 +131,11 @@ export default function Documents() {
             <div className="upload-subtitle">
               PDF text will be extracted and indexed into ChromaDB.
             </div>
+			<button
+			  disabled={!selectedFile || uploading}
+			  onClick={() => handlePdfUpload(selectedFile)}>
+			  {uploading ? "Uploading..." : "Upload PDF"}
+			</button>				
           </label>
 
           <div className="panel-header secondary">
