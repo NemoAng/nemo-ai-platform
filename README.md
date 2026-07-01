@@ -67,6 +67,9 @@ PostgreSQL (metadata)
 ### Search
 ![Search](./docs/search.png)
 
+### Settings
+![Search](./docs/settings.png)
+
 ---
 
 ## ⚙️ Tech Stack
