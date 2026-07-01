@@ -1,116 +1,90 @@
 # 🚀 Nemo AI Platform
 
-A production-ready Retrieval-Augmented Generation (RAG) platform that
-enables users to upload documents, perform semantic search, and interact
-with AI using contextual knowledge.
+Production-ready Retrieval-Augmented Generation (RAG) system with hybrid
+AI architecture.
 
-🌐 Live Demo: https://www.nemowang.dpdns.org/ai
+🌐 Live: https://www.nemowang.dpdns.org/ai/
 
 ------------------------------------------------------------------------
 
-## ✨ Features
+## ✨ Highlights
 
-### 📄 Document Management
-
--   Upload PDF documents (automatic text extraction)
--   Add manual text documents
--   Delete documents (SQLite + ChromaDB sync)
--   Automatic chunking and embedding
-
-### 🔍 Semantic Search
-
--   Vector-based similarity search
--   Top-K retrieval
--   Distance scoring
--   Chunk-level precision
-
-### 🤖 AI Chat (RAG)
-
--   Multi-turn conversation
--   Context-aware memory
--   Citation-based answers `[1][2]`
--   Markdown-rendered responses
-
-### 🧠 Conversation Memory
-
--   Context preserved across turns
--   LocalStorage persistence (no data loss on refresh)
-
-### 📊 System Monitoring
-
--   Backend health check
--   AI provider health
--   Vector database status
+-   🔁 **Multi-provider AI**: Gemini (primary) + **Ollama (phi3)
+    fallback**
+-   🧠 **RAG pipeline**: chunking → embeddings → vector search →
+    grounded answers
+-   📄 **PDF ingestion**: upload & auto-index
+-   💬 **Chat with memory**: multi-turn + citations
+-   🧩 **Provider decoupling**: Chat vs Embedding split for stability
+-   🐳 **Dockerized**: one-command deploy
 
 ------------------------------------------------------------------------
 
 ## 🧱 Architecture
 
-Frontend (React + TypeScript + Vite) ↓ Backend (FastAPI) ↓ RAG Pipeline
-├── Chunking ├── Embedding (OpenAI / Gemini) ├── Vector DB (ChromaDB)
-└── Semantic Search ↓ PostgreSQL (metadata storage)
+Frontend (React + TS + Vite) ↓ FastAPI Backend ↓ RAG Pipeline ├──
+Chunking ├── Embedding (Gemini) ├── Vector DB (ChromaDB) └── Retrieval ↓
+Chat Provider ├── Gemini (primary) └── Ollama (fallback: phi3) ↓
+PostgreSQL (metadata)
 
 ------------------------------------------------------------------------
 
 ## 🛠 Tech Stack
 
-### Frontend
+**Frontend** - React, TypeScript, Vite, React Router
 
--   React + TypeScript
--   Vite
--   React Router
--   Markdown Rendering (react-markdown)
+**Backend** - FastAPI, SQLAlchemy, Pydantic
 
-### Backend
+**AI / RAG** - Gemini (chat + embeddings) - Ollama (local LLM: phi3) -
+ChromaDB (vector store)
 
--   FastAPI
--   SQLAlchemy
--   Pydantic
-
-### AI / RAG
-
--   OpenAI / Gemini (pluggable providers)
--   ChromaDB (vector storage)
--   Custom chunking + embedding pipeline
-
-### Infrastructure
-
--   Docker Compose
--   Nginx (reverse proxy)
--   VPS (Contabo)
+**Infra** - Docker Compose, Nginx, VPS
 
 ------------------------------------------------------------------------
 
-## ⚙️ Deployment
+## ⚙️ Run
 
-### Backend
-
+``` bash
 docker compose up -d --build
+```
 
-### Frontend
+Frontend:
 
-cd frontend npm install npm run build
-
-cd .. ./scripts/deploy_frontend.sh
+``` bash
+cd frontend
+npm install
+npm run build
+cd ..
+./scripts/deploy_frontend.sh
+```
 
 ------------------------------------------------------------------------
 
-## 🎯 Key Highlights
+## 🔁 AI Strategy
 
--   End-to-end RAG system (not a demo)
--   Multi-provider AI abstraction
--   Production-ready deployment
+-   **Chat**: Gemini → fallback to Ollama (phi3) on quota/limits
+-   **Embedding**: Gemini (stable, fast)
+-   Ensures **availability** and **cost control**
+
+------------------------------------------------------------------------
+
+## 📸 Screens
+
+-   Dashboard (health)
+-   Chat (RAG + citations)
+-   Documents (PDF upload/index)
+-   Search (semantic)
 
 ------------------------------------------------------------------------
 
 ## 🧑‍💻 Author
 
 Nemo Wang\
-LinkedIn: https://www.linkedin.com/in/nemo-wang/\
+LinkedIn: https://www.linkedin.com/in/nemo-wang/ \
 GitHub: https://github.com/NemoAng/
 
 ------------------------------------------------------------------------
 
-## 📝 License
+## 📄 License
 
 MIT
