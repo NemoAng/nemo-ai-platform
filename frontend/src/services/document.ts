@@ -18,6 +18,21 @@ export function createDocument(title: string, content: string) {
   );
 }
 
+export function uploadPdf(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return requestJson<{
+    id: number;
+    title: string;
+    source_type: string;
+    indexed: boolean;
+  }>("/documents/upload", {
+    method: "POST",
+    body: formData,
+  });
+}
+
 export function listDocuments() {
   return requestJson<DocumentItem[]>("/documents");
 }

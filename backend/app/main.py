@@ -1,45 +1,32 @@
-from fastapi import FastAPI
-from sqlalchemy import text
-
-from app.db.base import Base
-from app.db.session import engine
-from app.models.user import User  # noqa: F401
-
-from app.ai.providers.factory import get_ai_provider
-
+import fitz
+from fastapi import Depends, FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
+from app.ai.chunker import chunk_text
 from app.ai.providers.exceptions import (
     AIProviderAuthError,
     AIProviderError,
     AIProviderQuotaError,
 )
-
-from app.vectorstore.chroma import chroma_health
-
-from fastapi import Depends
-from sqlalchemy.orm import Session
-
+from app.ai.providers.factory import get_ai_provider
+from app.db.base import Base
 from app.db.deps import get_db
+from app.db.session import engine
 from app.models.document import Document  # noqa: F401
 from app.models.document_chunk import DocumentChunk  # noqa: F401
-# from app.repositories.document_repository import create_document, list_documents, list_document_chunks
-from app.models.document_chunk import DocumentChunk  # noqa: F401
+from app.models.user import User  # noqa: F401
 from app.repositories.document_repository import (
     create_document,
     list_document_chunks,
     list_documents,
 )
-
 from app.schemas.document import DocumentCreate, DocumentOut
-
-from app.ai.chunker import chunk_text
-
 from app.services.embedding_service import index_document_chunks
-
-from app.services.search_service import semantic_search
-
 from app.services.rag_service import ask_ai
+from app.services.search_service import semantic_search
+from app.vectorstore.chroma import chroma_health
 
 app = FastAPI(title="Nemo AI Platform")
 
@@ -48,34 +35,6 @@ app = FastAPI(title="Nemo AI Platform")
 def startup():
     Base.metadata.create_all(bind=engine)
 
-
-@app.get("/health")
-def health():
-    with engine.connect() as conn:
-        db_result = conn.execute(text("SELECT 1")).scalar()
-
-    return {
-        "status": "ok",
-        "service": "nemo-ai-platform-backend",
-        "database": "ok" if db_result == 1 else "error"
-    }
-
-@app.get("/ai/test")
-def ai_test(q: str = "Hello AI"):
-    provider = get_ai_provider()
-
-    answer = provider.chat([
-        {"role": "user", "content": q}
-    ])
-
-    embedding = provider.embed(q)
-
-    return {
-        "provider": provider.name,
-        "question": q,
-        "answer": answer,
-        "embedding": embedding
-    }
 
 @app.exception_handler(AIProviderQuotaError)
 def ai_quota_error_handler(request, exc: AIProviderQuotaError):
@@ -113,6 +72,36 @@ def ai_provider_error_handler(request, exc: AIProviderError):
     )
 
 
+@app.get("/health")
+def health():
+    with engine.connect() as conn:
+        db_result = conn.execute(text("SELECT 1")).scalar()
+
+    return {
+        "status": "ok",
+        "service": "nemo-ai-platform-backend",
+        "database": "ok" if db_result == 1 else "error",
+    }
+
+
+@app.get("/ai/test")
+def ai_test(q: str = "Hello AI"):
+    provider = get_ai_provider()
+
+    answer = provider.chat([
+        {"role": "user", "content": q}
+    ])
+
+    embedding = provider.embed(q)
+
+    return {
+        "provider": provider.name,
+        "question": q,
+        "answer": answer,
+        "embedding": embedding,
+    }
+
+
 @app.get("/ai/provider/health")
 def ai_provider_health():
     provider = get_ai_provider()
@@ -148,6 +137,7 @@ def ai_provider_health():
         },
     }
 
+
 @app.get("/vector/health")
 def vector_health():
     result = chroma_health()
@@ -156,6 +146,7 @@ def vector_health():
         "vector_store": "chromadb",
         **result,
     }
+
 
 @app.post("/documents")
 def create_document_api(data: DocumentCreate, db: Session = Depends(get_db)):
@@ -170,9 +161,85 @@ def create_document_api(data: DocumentCreate, db: Session = Depends(get_db)):
         "index_result": index_result,
     }
 
+
+@app.post("/documents/upload")
+async def upload_document_api(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    filename = file.filename or "uploaded.pdf"
+
+    if not filename.lower().endswith(".pdf"):
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "unsupported_file_type",
+                "message": "Only PDF upload is currently supported.",
+            },
+        )
+
+    data = await file.read()
+
+    if not data:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "empty_file",
+                "message": "Uploaded file is empty.",
+            },
+        )
+
+    try:
+        pdf = fitz.open(stream=data, filetype="pdf")
+
+        text_parts = []
+        for page in pdf:
+            text_parts.append(page.get_text())
+
+        content = "\n".join(text_parts).strip()
+
+    except Exception as exc:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "pdf_parse_failed",
+                "message": str(exc),
+            },
+        )
+
+    if not content:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "empty_pdf_text",
+                "message": "No extractable text was found in this PDF.",
+            },
+        )
+
+    doc = create_document(
+        db,
+        DocumentCreate(
+            title=filename,
+            content=content,
+            source_type="pdf",
+        ),
+    )
+
+    index_result = index_document_chunks(db, doc.id)
+
+    return {
+        "id": doc.id,
+        "title": doc.title,
+        "source_type": doc.source_type,
+        "indexed": True,
+        "index_result": index_result,
+    }
+
+
 @app.get("/documents", response_model=list[DocumentOut])
 def list_documents_api(db: Session = Depends(get_db)):
     return list_documents(db)
+
 
 @app.post("/documents/chunk-test")
 def chunk_test(data: DocumentCreate):
@@ -189,6 +256,7 @@ def chunk_test(data: DocumentCreate):
             for chunk in chunks
         ],
     }
+
 
 @app.get("/documents/{document_id}/chunks")
 def get_document_chunks_api(document_id: int, db: Session = Depends(get_db)):
@@ -207,13 +275,16 @@ def get_document_chunks_api(document_id: int, db: Session = Depends(get_db)):
         ],
     }
 
+
 @app.post("/documents/{document_id}/index")
 def index_document_api(document_id: int, db: Session = Depends(get_db)):
     return index_document_chunks(db, document_id)
 
+
 @app.get("/search")
 def search_api(q: str, top_k: int = 5):
     return semantic_search(q, top_k)
+
 
 @app.get("/ask")
 def ask_api(q: str, top_k: int = 5):

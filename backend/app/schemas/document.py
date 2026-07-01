@@ -15,3 +15,10 @@ class DocumentOut(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+
+class UploadResponse(BaseModel):
+    id: int
+    title: str
+    source_type: str
+    indexed: bool

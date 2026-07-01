@@ -394,3 +394,58 @@ button:hover {
     grid-template-columns: 1fr;
   }
 }
+
+.page-subtitle {
+  color: var(--subtext);
+  margin-top: -8px;
+  margin-bottom: 24px;
+}
+
+.documents-layout {
+  display: grid;
+  grid-template-columns: 420px minmax(0, 1fr);
+  gap: 24px;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.panel-header.secondary {
+  margin-top: 28px;
+}
+
+.upload-box {
+  display: block;
+  border: 1px dashed var(--border);
+  background: #11161d;
+  border-radius: 14px;
+  padding: 28px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.upload-box input {
+  display: none;
+}
+
+.upload-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.upload-subtitle {
+  color: var(--subtext);
+  font-size: 14px;
+}
+
+.document-list.standalone {
+  margin-top: 0;
+  border-top: none;
+  padding-top: 0;
+}
+
+@media (max-width: 1100px) {
+  .documents-layout {
+    grid-template-columns: 1fr;
+  }
+}
