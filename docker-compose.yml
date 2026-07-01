@@ -10,6 +10,8 @@ services:
     depends_on:
       - postgres
       - chromadb
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   postgres:
     image: postgres:16

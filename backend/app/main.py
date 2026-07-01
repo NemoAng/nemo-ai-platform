@@ -1,5 +1,5 @@
 import fitz
-from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi import Body, Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -105,10 +105,13 @@ def ai_test(q: str = "Hello AI"):
         "embedding": embedding,
     }
 
+from app.ai.providers.factory import get_chat_provider_with_fallback
+from app.ai.providers.gemini_provider import GeminiProvider
 
 @app.get("/ai/provider/health")
 def ai_provider_health():
-    provider = get_ai_provider()
+    chat_provider = get_chat_provider_with_fallback()
+    embedding_provider = GeminiProvider()
 
     chat_ok = False
     embedding_ok = False
@@ -116,7 +119,7 @@ def ai_provider_health():
     embedding_error = None
 
     try:
-        answer = provider.chat([
+        answer = chat_provider.chat([
             {"role": "user", "content": "Reply with OK only."}
         ])
         chat_ok = bool(answer)
@@ -124,13 +127,13 @@ def ai_provider_health():
         chat_error = str(exc)
 
     try:
-        embedding = provider.embed("health check")
+        embedding = embedding_provider.embed("health check")
         embedding_ok = isinstance(embedding, list) and len(embedding) > 0
     except Exception as exc:
         embedding_error = str(exc)
 
     return {
-        "provider": provider.name,
+        "provider": chat_provider.name,
         "chat": {
             "ok": chat_ok,
             "error": chat_error,
@@ -140,7 +143,6 @@ def ai_provider_health():
             "error": embedding_error,
         },
     }
-
 
 @app.get("/vector/health")
 def vector_health():

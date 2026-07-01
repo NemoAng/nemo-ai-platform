@@ -1,6 +1,6 @@
 from app.ai.providers.factory import get_ai_provider
 from app.services.search_service import semantic_search
-
+from app.ai.providers.factory import get_chat_provider_with_fallback
 
 def format_sources(matches):
     sources = []
@@ -41,7 +41,7 @@ def build_chat_history(messages):
 
 
 def ask_ai(query: str, top_k: int = 5, messages=None):
-    provider = get_ai_provider()
+    provider = get_chat_provider_with_fallback()
 
     search_result = semantic_search(query, top_k)
     matches = search_result["matches"]

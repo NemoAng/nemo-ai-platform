@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.ai.providers.factory import get_ai_provider
+from app.ai.providers.gemini_provider import GeminiProvider
 from app.models.document_chunk import DocumentChunk
 from app.vectorstore.chroma import get_chroma_client
 
@@ -9,7 +9,12 @@ COLLECTION_NAME = "document_chunks"
 
 
 def index_document_chunks(db: Session, document_id: int) -> dict:
-    provider = get_ai_provider()
+    # ❌ 不再用默认 provider
+    # provider = get_ai_provider()
+
+    # ✅ 强制用 Gemini 做 embedding
+    embedding_provider = GeminiProvider()
+
     client = get_chroma_client()
     collection = client.get_or_create_collection(name=COLLECTION_NAME)
 
@@ -23,7 +28,7 @@ def index_document_chunks(db: Session, document_id: int) -> dict:
     indexed = 0
 
     for chunk in chunks:
-        embedding = provider.embed(chunk.content)
+        embedding = embedding_provider.embed(chunk.content)
 
         collection.add(
             ids=[f"doc-{document_id}-chunk-{chunk.id}"],
@@ -43,7 +48,7 @@ def index_document_chunks(db: Session, document_id: int) -> dict:
     return {
         "document_id": document_id,
         "indexed_chunks": indexed,
-        "provider": provider.name,
+        "provider": "gemini",  # 👈 明确标识
         "collection": COLLECTION_NAME,
     }
 
