@@ -449,3 +449,142 @@ button:hover {
     grid-template-columns: 1fr;
   }
 }
+
+.empty-state {
+  color: var(--subtext);
+  background: #11161d;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.chat-page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 220px);
+  margin-top: 24px;
+}
+
+.chat-history {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-input-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+  margin-top: 20px;
+}
+
+.chat-input-bar textarea {
+  min-height: 120px;
+}
+
+.source-meta {
+  color: var(--subtext);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+@media (max-width: 900px) {
+  .chat-input-bar {
+    grid-template-columns: 1fr;
+  }
+}
+
+.search-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.search-results {
+  margin-top: 28px;
+}
+
+.search-result-card {
+  background: #11161d;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  margin-top: 14px;
+}
+
+.search-result-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.search-result-card p {
+  color: var(--text);
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .search-bar {
+    grid-template-columns: 1fr;
+  }
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.settings-panel {
+  min-height: 260px;
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+}
+
+.settings-row span {
+  color: var(--subtext);
+}
+
+.settings-error {
+  margin-top: 16px;
+  color: #f85149;
+  background: #2b1113;
+  border: 1px solid #5d1f25;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.settings-list {
+  display: grid;
+  gap: 12px;
+  color: var(--subtext);
+}
+
+@media (max-width: 900px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.document-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.danger-button {
+  background: #da3633;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.danger-button:hover {
+  background: #f85149;
+}

@@ -33,6 +33,15 @@ export function uploadPdf(file: File) {
   });
 }
 
+export function deleteDocument(documentId: number) {
+  return requestJson<{
+    deleted: boolean;
+    document_id: number;
+  }>(`/documents/${documentId}`, {
+    method: "DELETE",
+  });
+}
+
 export function listDocuments() {
   return requestJson<DocumentItem[]>("/documents");
 }

@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { createDocument, listDocuments, uploadPdf } from "../services/document";
+import {
+  createDocument,
+  deleteDocument,
+  listDocuments,
+  uploadPdf,
+} from "../services/document";
 import type { DocumentItem } from "../types/api";
 
 export default function Documents() {
@@ -9,6 +14,7 @@ export default function Documents() {
 
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [status, setStatus] = useState("");
 
   async function refresh() {
@@ -68,6 +74,25 @@ export default function Documents() {
     }
   }
 
+  async function handleDelete(doc: DocumentItem) {
+    const ok = window.confirm(`Delete "${doc.title}"?`);
+
+    if (!ok) return;
+
+    setDeletingId(doc.id);
+    setStatus(`Deleting ${doc.title}...`);
+
+    try {
+      await deleteDocument(doc.id);
+      await refresh();
+      setStatus("Document deleted.");
+    } catch (err) {
+      setStatus((err as Error).message);
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   return (
     <div className="page">
       <h1>Documents</h1>
@@ -86,6 +111,7 @@ export default function Documents() {
             <input
               type="file"
               accept="application/pdf"
+              disabled={uploading}
               onChange={(e) => handlePdfUpload(e.target.files?.[0] ?? null)}
             />
             <div className="upload-title">
@@ -138,7 +164,17 @@ export default function Documents() {
                   <strong>{doc.title}</strong>
                   <span>{doc.source_type}</span>
                 </div>
-                <small>#{doc.id}</small>
+
+                <div className="document-actions">
+                  <small>#{doc.id}</small>
+                  <button
+                    className="danger-button"
+                    disabled={deletingId === doc.id}
+                    onClick={() => handleDelete(doc)}
+                  >
+                    {deletingId === doc.id ? "Deleting..." : "Delete"}
+                  </button>
+                </div>
               </div>
             ))}
           </div>

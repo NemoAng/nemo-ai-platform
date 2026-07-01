@@ -35,6 +35,14 @@ def list_documents(db: Session) -> list[Document]:
     return db.query(Document).order_by(Document.id.desc()).all()
 
 
+def get_document(db: Session, document_id: int) -> Document | None:
+    return (
+        db.query(Document)
+        .filter(Document.id == document_id)
+        .first()
+    )
+
+
 def list_document_chunks(db: Session, document_id: int) -> list[DocumentChunk]:
     return (
         db.query(DocumentChunk)
@@ -42,3 +50,19 @@ def list_document_chunks(db: Session, document_id: int) -> list[DocumentChunk]:
         .order_by(DocumentChunk.chunk_index.asc())
         .all()
     )
+
+
+def delete_document(db: Session, document_id: int) -> bool:
+    doc = get_document(db, document_id)
+
+    if not doc:
+        return False
+
+    db.query(DocumentChunk).filter(
+        DocumentChunk.document_id == document_id
+    ).delete()
+
+    db.delete(doc)
+    db.commit()
+
+    return True

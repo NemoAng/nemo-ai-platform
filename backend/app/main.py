@@ -1,5 +1,5 @@
 import fitz
-from fastapi import Depends, FastAPI, File, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -19,11 +19,15 @@ from app.models.document_chunk import DocumentChunk  # noqa: F401
 from app.models.user import User  # noqa: F401
 from app.repositories.document_repository import (
     create_document,
+    delete_document,
     list_document_chunks,
     list_documents,
 )
 from app.schemas.document import DocumentCreate, DocumentOut
-from app.services.embedding_service import index_document_chunks
+from app.services.embedding_service import (
+    delete_document_embeddings,
+    index_document_chunks,
+)
 from app.services.rag_service import ask_ai
 from app.services.search_service import semantic_search
 from app.vectorstore.chroma import chroma_health
@@ -239,6 +243,24 @@ async def upload_document_api(
 @app.get("/documents", response_model=list[DocumentOut])
 def list_documents_api(db: Session = Depends(get_db)):
     return list_documents(db)
+
+
+@app.delete("/documents/{document_id}")
+def delete_document_api(document_id: int, db: Session = Depends(get_db)):
+    embedding_result = delete_document_embeddings(db, document_id)
+    deleted = delete_document(db, document_id)
+
+    if not deleted:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found",
+        )
+
+    return {
+        "deleted": True,
+        "document_id": document_id,
+        "embedding_result": embedding_result,
+    }
 
 
 @app.post("/documents/chunk-test")

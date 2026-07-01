@@ -21,7 +21,7 @@ import type {
   VectorHealth,
 } from "./types/api";
 
-function App() {
+export default function App() {
   const [backend, setBackend] = useState<BackendHealth | null>(null);
   const [provider, setProvider] = useState<ProviderHealth | null>(null);
   const [vector, setVector] = useState<VectorHealth | null>(null);
@@ -93,5 +93,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
