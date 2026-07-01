@@ -1,8 +1,20 @@
-import type { AskResult } from "../types/api";
 import { requestJson } from "./client";
+import type { AskResult } from "../types/api";
 
-export function askAI(question: string, topK = 3) {
-  return requestJson<AskResult>(
-    `/ask?q=${encodeURIComponent(question)}&top_k=${topK}`
-  );
+export function askAI(
+  question: string,
+  topK = 5,
+  messages: any[] = []
+) {
+  return requestJson<AskResult>("/ask", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      q: question,
+      top_k: topK,
+      messages,
+    }),
+  });
 }

@@ -307,7 +307,12 @@ def index_document_api(document_id: int, db: Session = Depends(get_db)):
 def search_api(q: str, top_k: int = 5):
     return semantic_search(q, top_k)
 
+@app.post("/ask")
+def ask_api(
+    data: dict = Body(...),
+):
+    q = data.get("q")
+    top_k = data.get("top_k", 5)
+    messages = data.get("messages", [])
 
-@app.get("/ask")
-def ask_api(q: str, top_k: int = 5):
-    return ask_ai(q, top_k)
+    return ask_ai(q, top_k, messages)

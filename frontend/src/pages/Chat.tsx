@@ -1,88 +1,117 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { askAI } from "../services/ai";
-import type { AskResult } from "../types/api";
+import { MarkdownRenderer } from "../components/MarkdownRenderer";
+
+type Message = {
+  role: "user" | "ai";
+  content: string;
+};
+
+const STORAGE_KEY = "nemo_chat_history";
 
 export default function Chat() {
   const [question, setQuestion] = useState("");
-  const [result, setResult] = useState<AskResult | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [sources, setSources] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("");
+
+  // ✅ 加载历史
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        setMessages(JSON.parse(saved));
+      } catch {}
+    }
+  }, []);
+
+  // ✅ 保存历史
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  }, [messages]);
 
   async function send() {
-    if (!question.trim()) {
-      setStatus("Please enter a question.");
-      return;
-    }
+    if (!question.trim()) return;
 
+    const userMsg: Message = { role: "user", content: question };
+
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setQuestion("");
     setLoading(true);
-    setStatus("Thinking...");
 
     try {
-      const data = await askAI(question, 5);
-      setResult(data);
-      setStatus("");
-    } catch (err) {
-      setStatus((err as Error).message);
+      const result = await askAI(question, 5, newMessages) as any;
+
+      const aiMsg: Message = {
+        role: "ai",
+        content: result.answer,
+      };
+
+      const finalMessages = [...newMessages, aiMsg];
+      setMessages(finalMessages);
+
+      setSources(result.sources || []);
     } finally {
       setLoading(false);
     }
   }
 
+  function clearChat() {
+    setMessages([]);
+    setSources([]);
+    localStorage.removeItem(STORAGE_KEY);
+  }
+
   return (
     <div className="page">
       <h1>AI Chat</h1>
-      <p className="page-subtitle">
-        Ask questions against your indexed knowledge base.
-      </p>
 
       <div className="chat-page">
+
         <div className="chat-history">
-          {!result && (
+
+          {messages.length === 0 && (
             <div className="empty-state">
-              Ask a question about your uploaded documents or PDFs.
+              Start a conversation.
             </div>
           )}
 
-          {result && (
-            <>
-              <div className="message user">
-                <strong>You</strong>
-                <p>{result.question}</p>
-              </div>
+          {messages.map((msg, i) => (
+            <div key={i} className={`message ${msg.role}`}>
+              <strong>{msg.role === "user" ? "You" : "Nemo AI"}</strong>
 
-              <div className="message ai">
-                <strong>Nemo AI · {result.provider}</strong>
-                <p>{result.answer}</p>
-              </div>
+              {msg.role === "ai" ? (
+                <MarkdownRenderer content={msg.content} />
+              ) : (
+                <p>{msg.content}</p>
+              )}
+            </div>
+          ))}
 
-              <div className="sources">
-                <h3>Sources</h3>
+          {sources.length > 0 && (
+            <div className="sources">
+              <h3>Sources</h3>
 
-                {result.sources.map((source) => (
-                  <div
-                    className="source"
-                    key={`${source.document_id}-${source.chunk_id}`}
-                  >
-                    <strong>
-                      Source {source.source_number} · Document{" "}
-                      {source.document_id}
-                    </strong>
-                    <div className="source-meta">
-                      Chunk {source.chunk_index} · Distance{" "}
-                      {source.distance?.toFixed?.(4) ?? source.distance}
-                    </div>
-                    <p>{source.content_preview}</p>
+              {sources.map((s, i) => (
+                <div key={i} className="source-card">
+                  <strong>[{s.source_number}] Document {s.document_id}</strong>
+                  <div className="source-meta">
+                    Chunk {s.chunk_index}
                   </div>
-                ))}
-              </div>
-            </>
+                  <p>{s.content_preview}</p>
+                </div>
+              ))}
+            </div>
           )}
+        </div>
+
+        <div className="chat-toolbar">
+          <button onClick={clearChat}>Clear</button>
         </div>
 
         <div className="chat-input-bar">
           <textarea
-            rows={4}
-            placeholder="Ask Nemo AI..."
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
           />
@@ -91,8 +120,6 @@ export default function Chat() {
             {loading ? "Thinking..." : "Send"}
           </button>
         </div>
-
-        {status && <div className="status">{status}</div>}
       </div>
     </div>
   );

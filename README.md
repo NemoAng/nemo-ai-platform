@@ -1,174 +1,116 @@
-# Nemo AI Platform
+# 🚀 Nemo AI Platform
 
-A self-hosted AI platform for personal knowledge, document intelligence, Retrieval-Augmented Generation (RAG), AI agents, and future media intelligence.
+A production-ready Retrieval-Augmented Generation (RAG) platform that
+enables users to upload documents, perform semantic search, and interact
+with AI using contextual knowledge.
 
----
+🌐 Live Demo: https://www.nemowang.dpdns.org/ai
 
-## 🚀 Current Status
+------------------------------------------------------------------------
 
-Nemo AI Platform is currently under active development and already includes:
+## ✨ Features
 
-- FastAPI backend
-- PostgreSQL database
-- ChromaDB vector database
-- Gemini provider integration
-- OpenAI-compatible provider abstraction
-- Document ingestion
-- Automatic text chunking
-- Embedding generation
-- Semantic search
-- RAG Ask API with source citations
-- React + TypeScript frontend
-- Nginx deployment under `/ai/`
-- HTTPS
-- Basic Authentication
-- Docker Compose deployment
-- Git Flow based development
+### 📄 Document Management
 
----
+-   Upload PDF documents (automatic text extraction)
+-   Add manual text documents
+-   Delete documents (SQLite + ChromaDB sync)
+-   Automatic chunking and embedding
 
-## 🌐 Public URL
+### 🔍 Semantic Search
 
-### Frontend
+-   Vector-based similarity search
+-   Top-K retrieval
+-   Distance scoring
+-   Chunk-level precision
 
-```
-https://www.nemowang.dpdns.org/ai/
-```
+### 🤖 AI Chat (RAG)
 
-### Backend API
+-   Multi-turn conversation
+-   Context-aware memory
+-   Citation-based answers `[1][2]`
+-   Markdown-rendered responses
 
-```
-https://www.nemowang.dpdns.org/ai-api/
-```
+### 🧠 Conversation Memory
 
----
+-   Context preserved across turns
+-   LocalStorage persistence (no data loss on refresh)
 
-## 🏗 Architecture
+### 📊 System Monitoring
 
-```text
-Browser
-    │
-    ▼
-Nginx (HTTPS + Basic Auth)
-    │
-    ├──────────────┐
-    ▼              ▼
-React UI      FastAPI Backend
-                     │
-      ┌──────────────┼──────────────┐
-      ▼              ▼              ▼
- PostgreSQL      ChromaDB      AI Providers
-                                   │
-                    ┌──────────────┴──────────────┐
-                    ▼                             ▼
-                 Gemini                     OpenAI Compatible
-```
+-   Backend health check
+-   AI provider health
+-   Vector database status
 
----
+------------------------------------------------------------------------
+
+## 🧱 Architecture
+
+Frontend (React + TypeScript + Vite) ↓ Backend (FastAPI) ↓ RAG Pipeline
+├── Chunking ├── Embedding (OpenAI / Gemini) ├── Vector DB (ChromaDB)
+└── Semantic Search ↓ PostgreSQL (metadata storage)
+
+------------------------------------------------------------------------
 
 ## 🛠 Tech Stack
 
-### Backend
-
-- Python 3.12
-- FastAPI
-- SQLAlchemy
-- PostgreSQL
-- ChromaDB
-
-### AI
-
-- Google Gemini
-- OpenAI Compatible API
-- Embeddings
-- Semantic Search
-- Retrieval-Augmented Generation (RAG)
-
 ### Frontend
 
-- React
-- TypeScript
-- Vite
+-   React + TypeScript
+-   Vite
+-   React Router
+-   Markdown Rendering (react-markdown)
+
+### Backend
+
+-   FastAPI
+-   SQLAlchemy
+-   Pydantic
+
+### AI / RAG
+
+-   OpenAI / Gemini (pluggable providers)
+-   ChromaDB (vector storage)
+-   Custom chunking + embedding pipeline
 
 ### Infrastructure
 
-- Docker Compose
-- Nginx
-- Contabo VPS
-- HTTPS (Let's Encrypt)
-- Basic Authentication
+-   Docker Compose
+-   Nginx (reverse proxy)
+-   VPS (Contabo)
 
----
+------------------------------------------------------------------------
 
-## 📂 Project Structure
+## ⚙️ Deployment
 
-```text
-backend/
-frontend/
-scripts/
-docker-compose.yml
-README.md
-```
+### Backend
 
----
+docker compose up -d --build
 
-## ✨ Current Features
+### Frontend
 
-- Upload text documents
-- Automatic chunk generation
-- Automatic embedding generation
-- Automatic indexing into ChromaDB
-- Semantic vector search
-- AI question answering with retrieved context
-- Source citation support
-- Provider health check
-- Backend health dashboard
+cd frontend npm install npm run build
 
----
+cd .. ./scripts/deploy_frontend.sh
 
-## 📋 Roadmap
+------------------------------------------------------------------------
 
-### Phase 1 ✅
+## 🎯 Key Highlights
 
-- FastAPI
-- PostgreSQL
-- ChromaDB
-- Gemini
-- OpenAI Provider
-- React Frontend
-- Basic RAG
+-   End-to-end RAG system (not a demo)
+-   Multi-provider AI abstraction
+-   Production-ready deployment
 
-### Phase 2 🚧
+------------------------------------------------------------------------
 
-- Dashboard
-- Provider Management
-- OAuth Login
-- PDF Upload
-- DOCX Upload
-- Markdown Import
-- Conversation History
+## 🧑‍💻 Author
 
-### Phase 3
+Nemo Wang\
+LinkedIn: https://www.linkedin.com/in/nemo-wang/\
+GitHub: https://github.com/NemoAng/
 
-- Nemo VOD Integration
-- Video Transcript Indexing
-- OCR
-- Image Search
-- Audio Search
+------------------------------------------------------------------------
 
-### Phase 4
+## 📝 License
 
-- MCP Tools
-- AI Agents
-- Workflow Engine
-- Multi-user Support
-
----
-
-## 📄 License
-
-Personal project by **Nemo Wang**.
-
-```
-
----
+MIT

@@ -58,7 +58,7 @@ export default function App() {
     setStatus("Asking AI...");
 
     try {
-      const data = await askAIRequest(question, 3);
+      const data = await askAIRequest(question, 3) as AskResult;
       setAnswer(data);
       setStatus("Answer received.");
     } catch (err) {

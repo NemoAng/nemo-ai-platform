@@ -2,52 +2,88 @@ from app.ai.providers.factory import get_ai_provider
 from app.services.search_service import semantic_search
 
 
-def ask_ai(question: str, top_k: int = 5) -> dict:
-    provider = get_ai_provider()
-
-    search_result = semantic_search(question, top_k)
-    matches = search_result["matches"]
-
-    context_blocks = []
+def format_sources(matches):
     sources = []
+    context_blocks = []
 
-    for index, match in enumerate(matches, start=1):
-        metadata = match.get("metadata") or {}
-        content = match.get("content") or ""
+    for i, m in enumerate(matches):
+        idx = i + 1
 
-        context_blocks.append(f"[Source {index}]\n{content}")
+        context_blocks.append(
+            f"[{idx}] {m['content']}"
+        )
 
         sources.append({
-            "source_number": index,
-            "document_id": metadata.get("document_id"),
-            "chunk_id": metadata.get("chunk_id"),
-            "chunk_index": metadata.get("chunk_index"),
-            "distance": match.get("distance"),
-            "content_preview": content[:300],
+            "source_number": idx,
+            "document_id": m["metadata"].get("document_id"),
+            "chunk_id": m["metadata"].get("chunk_id"),
+            "chunk_index": m["metadata"].get("chunk_index"),
+            "distance": m.get("distance"),
+            "content_preview": m["content"][:300],
         })
 
-    context = "\n\n".join(context_blocks)
+    context_text = "\n\n".join(context_blocks)
 
-    messages = [
-        {
-            "role": "system",
-            "content": (
-                "You are Nemo AI Platform. Answer the user's question using only the provided context. "
-                "If the context does not contain the answer, say you do not know based on the available documents. "
-                "When useful, reference the source numbers."
-            ),
-        },
-        {
-            "role": "user",
-            "content": f"Context:\n{context}\n\nQuestion:\n{question}",
-        },
+    return context_text, sources
+
+
+def build_chat_history(messages):
+    history = []
+
+    for m in messages[-6:]:  # 限制上下文长度（重要）
+        role = "user" if m["role"] == "user" else "assistant"
+        history.append({
+            "role": role,
+            "content": m["content"]
+        })
+
+    return history
+
+
+def ask_ai(query: str, top_k: int = 5, messages=None):
+    provider = get_ai_provider()
+
+    search_result = semantic_search(query, top_k)
+    matches = search_result["matches"]
+
+    context_text, sources = format_sources(matches)
+
+    system_prompt = f"""
+You are an AI assistant using RAG.
+
+Use the provided sources to answer.
+
+Rules:
+- Cite sources like [1], [2]
+- Be concise
+- Use bullet points if useful
+"""
+
+    user_prompt = f"""
+Question:
+{query}
+
+Sources:
+{context_text}
+"""
+
+    chat_messages = [
+        {"role": "system", "content": system_prompt}
     ]
 
-    answer = provider.chat(messages)
+    if messages:
+        chat_messages.extend(build_chat_history(messages))
+
+    chat_messages.append({
+        "role": "user",
+        "content": user_prompt
+    })
+
+    answer = provider.chat(chat_messages)
 
     return {
-        "question": question,
-        "answer": answer,
         "provider": provider.name,
+        "question": query,
+        "answer": answer,
         "sources": sources,
     }
