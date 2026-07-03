@@ -6,6 +6,11 @@ import {
   getVectorHealth,
 } from "../services/health";
 import { listDocuments } from "../services/document";
+import {
+  formatProviderHealthCacheTime,
+  getCachedProviderHealth,
+  setCachedProviderHealth,
+} from "../services/providerHealthCache";
 
 import type {
   BackendHealth,
@@ -19,24 +24,57 @@ export function Dashboard() {
   const [provider, setProvider] = useState<ProviderHealth | null>(null);
   const [vector, setVector] = useState<VectorHealth | null>(null);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
+  const [refreshingProvider, setRefreshingProvider] = useState(false);
+  const [providerStatus, setProviderStatus] = useState("Click refresh to check provider health.");
 
-  // 🔥 实时刷新（每 5 秒）
   useEffect(() => {
-    const load = () => {
+    const cachedProvider = getCachedProviderHealth();
+
+    if (cachedProvider) {
+      setProvider(cachedProvider.value);
+      setProviderStatus(
+        `Cached provider health from ${formatProviderHealthCacheTime(cachedProvider.updatedAt)}.`
+      );
+    }
+
+    const loadSystemStatus = () => {
       getBackendHealth().then(setBackend);
-      getProviderHealth().then(setProvider);
       getVectorHealth().then(setVector);
       listDocuments().then(setDocuments);
     };
 
-    load();
-    const timer = setInterval(load, 5000);
-
-    return () => clearInterval(timer);
+    loadSystemStatus();
   }, []);
+
+  async function refreshProviderHealth() {
+    if (refreshingProvider) return;
+
+    setRefreshingProvider(true);
+    setProviderStatus("Refreshing provider health...");
+
+    try {
+      const providerHealth = await getProviderHealth();
+      const cachedProvider = setCachedProviderHealth(providerHealth);
+      setProvider(providerHealth);
+      setProviderStatus(
+        `Provider health refreshed at ${formatProviderHealthCacheTime(cachedProvider.updatedAt)}.`
+      );
+    } catch (err) {
+      setProviderStatus(err instanceof Error ? err.message : "Provider refresh failed.");
+    } finally {
+      setRefreshingProvider(false);
+    }
+  }
 
   return (
     <div className="page">
+      <div className="dashboard-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p className="page-subtitle">{providerStatus}</p>
+        </div>
+      </div>
+
       <div className="card-grid">
         {/* Backend */}
         <div className="card">
@@ -52,17 +90,26 @@ export function Dashboard() {
 
         {/* Provider */}
         <div className="card">
-          <div className="card-title">AI Provider</div>
+          <div className="card-header">
+            <div className="card-title">AI Provider</div>
+            <button
+              className="card-action-button"
+              disabled={refreshingProvider}
+              onClick={refreshProviderHealth}
+            >
+              {refreshingProvider ? "Refreshing..." : "Refresh"}
+            </button>
+          </div>
           <div className="card-value">
             <span className="status-dot" />
-            {provider ? provider.provider : "Loading..."}
+            {provider ? provider.provider : "Not checked"}
           </div>
           <div className="card-sub">
             {provider
               ? `Chat: ${provider.chat.ok ? "Online" : "Offline"} · Embedding: ${
                   provider.embedding.ok ? "Online" : "Offline"
                 }`
-              : "Checking..."}
+              : "Click refresh to check"}
           </div>
         </div>
 

@@ -4,6 +4,11 @@ import {
   getProviderHealth,
   getVectorHealth,
 } from "../services/health";
+import {
+  formatProviderHealthCacheTime,
+  getCachedProviderHealth,
+  setCachedProviderHealth,
+} from "../services/providerHealthCache";
 import type {
   BackendHealth,
   ProviderHealth,
@@ -15,20 +20,49 @@ export default function Settings() {
   const [provider, setProvider] = useState<ProviderHealth | null>(null);
   const [vector, setVector] = useState<VectorHealth | null>(null);
   const [status, setStatus] = useState("");
+  const [providerStatus, setProviderStatus] = useState("Click refresh to check provider health.");
+  const [refreshingProvider, setRefreshingProvider] = useState(false);
 
   useEffect(() => {
+    const cachedProvider = getCachedProviderHealth();
+
+    if (cachedProvider) {
+      setProvider(cachedProvider.value);
+      setProviderStatus(
+        `Cached provider health from ${formatProviderHealthCacheTime(cachedProvider.updatedAt)}.`
+      );
+    }
+
     Promise.all([
       getBackendHealth(),
-      getProviderHealth(),
       getVectorHealth(),
     ])
-      .then(([backendHealth, providerHealth, vectorHealth]) => {
+      .then(([backendHealth, vectorHealth]) => {
         setBackend(backendHealth);
-        setProvider(providerHealth);
         setVector(vectorHealth);
       })
       .catch((err) => setStatus((err as Error).message));
   }, []);
+
+  async function refreshProviderHealth() {
+    if (refreshingProvider) return;
+
+    setRefreshingProvider(true);
+    setProviderStatus("Refreshing provider health...");
+
+    try {
+      const providerHealth = await getProviderHealth();
+      const cachedProvider = setCachedProviderHealth(providerHealth);
+      setProvider(providerHealth);
+      setProviderStatus(
+        `Provider health refreshed at ${formatProviderHealthCacheTime(cachedProvider.updatedAt)}.`
+      );
+    } catch (err) {
+      setProviderStatus(err instanceof Error ? err.message : "Provider refresh failed.");
+    } finally {
+      setRefreshingProvider(false);
+    }
+  }
 
   return (
     <div className="page">
@@ -43,8 +77,19 @@ export default function Settings() {
         <section className="panel settings-panel">
           <div className="panel-header">
             <h2>AI Provider</h2>
-            <span>{provider?.provider ?? "Loading"}</span>
+            <div className="panel-header-actions">
+              <span>{provider?.provider ?? "Not checked"}</span>
+              <button
+                className="card-action-button"
+                disabled={refreshingProvider}
+                onClick={refreshProviderHealth}
+              >
+                {refreshingProvider ? "Refreshing..." : "Refresh"}
+              </button>
+            </div>
           </div>
+
+          <div className="settings-hint">{providerStatus}</div>
 
           <div className="settings-row">
             <span>Chat</span>

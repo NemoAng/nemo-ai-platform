@@ -229,6 +229,12 @@ h2 {
   font-size: 22px;
 }
 
+.panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 /* ==============================
    Inputs
 ============================== */
@@ -268,6 +274,11 @@ button {
 
 button:hover {
   opacity: .95;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
 }
 
 /* ==============================
@@ -417,7 +428,6 @@ button:hover {
 .page button {
   display: block;
   margin-left: auto;
-  margin-bottom: 16px;
 }
 
 .documents-layout {
@@ -588,6 +598,13 @@ button:hover {
   color: var(--subtext);
 }
 
+.settings-hint {
+  color: var(--subtext);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
 .settings-error {
   margin-top: 16px;
   color: #f85149;
@@ -709,11 +726,32 @@ button:hover {
   margin-top: 20px;
 }
 
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+
 .card {
   background: #161b22;
   border-radius: 12px;
   padding: 20px;
   border: 1px solid #30363d;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.card-action-button {
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 20px;
+  line-height: 1;
 }
 
 .card-title {
