@@ -1,6 +1,8 @@
+import json
+
 import fitz
 from fastapi import Body, Depends, FastAPI, File, HTTPException, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -28,7 +30,7 @@ from app.services.embedding_service import (
     delete_document_embeddings,
     index_document_chunks,
 )
-from app.services.rag_service import ask_ai
+from app.services.rag_service import ask_ai, ask_ai_stream
 from app.services.search_service import semantic_search
 from app.vectorstore.chroma import chroma_health
 
@@ -318,3 +320,30 @@ def ask_api(
     messages = data.get("messages", [])
 
     return ask_ai(q, top_k, messages)
+
+
+@app.post("/ask/stream")
+def ask_stream_api(
+    data: dict = Body(...),
+):
+    q = data.get("q")
+    top_k = data.get("top_k", 5)
+    messages = data.get("messages", [])
+
+    def stream_events():
+        try:
+            for event in ask_ai_stream(q, top_k, messages):
+                yield json.dumps(event, ensure_ascii=False) + "\n"
+        except Exception as exc:
+            yield json.dumps(
+                {
+                    "type": "error",
+                    "message": str(exc),
+                },
+                ensure_ascii=False,
+            ) + "\n"
+
+    return StreamingResponse(
+        stream_events(),
+        media_type="application/x-ndjson",
+    )

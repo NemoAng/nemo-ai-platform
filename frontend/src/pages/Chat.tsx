@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { askAI } from "../services/ai";
+import { askAIStream } from "../services/ai";
 import { MarkdownRenderer } from "../components/MarkdownRenderer";
+import type { AskResult } from "../types/api";
 
 type Message = {
   role: "user" | "ai";
@@ -9,10 +10,25 @@ type Message = {
 
 const STORAGE_KEY = "nemo_chat_history";
 
+type Source = AskResult["sources"][number];
+
+function getCitedSources(answer: string, allSources: Source[]) {
+  const citedNumbers = new Set<number>();
+  const citationPattern = /\[(\d+)\]/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = citationPattern.exec(answer)) !== null) {
+    citedNumbers.add(Number(match[1]));
+  }
+
+  return allSources.filter((source) => citedNumbers.has(source.source_number));
+}
+
 export default function Chat() {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [sources, setSources] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   // ✅ 加载历史
@@ -38,20 +54,42 @@ export default function Chat() {
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
     setQuestion("");
+    setError(null);
+    setSources([]);
     setLoading(true);
 
     try {
-      const result = await askAI(question, 5, newMessages) as any;
-
       const aiMsg: Message = {
         role: "ai",
-        content: result.answer,
+        content: "",
       };
 
-      const finalMessages = [...newMessages, aiMsg];
-      setMessages(finalMessages);
+      const aiIndex = newMessages.length;
+      let streamedAnswer = "";
+      let availableSources: Source[] = [];
+      setMessages([...newMessages, aiMsg]);
 
-      setSources(result.sources || []);
+      await askAIStream(question, 5, newMessages, {
+        onMeta: (meta) => {
+          availableSources = meta.sources || [];
+        },
+        onToken: (token) => {
+          streamedAnswer += token;
+          setMessages((current) =>
+            current.map((message, index) =>
+              index === aiIndex
+                ? { ...message, content: message.content + token }
+                : message
+            )
+          );
+        },
+        onDone: () => {
+          setSources(getCitedSources(streamedAnswer, availableSources));
+        },
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to send message.";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -103,6 +141,12 @@ export default function Chat() {
               ))}
             </div>
           )}
+		  
+          {error && (
+            <div className="chat-error">
+              {error}
+            </div>
+          )}		  
         </div>
 
 
@@ -111,10 +155,17 @@ export default function Chat() {
           <textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
+            disabled={loading}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                send();
+              }
+            }}
           />
         </div>
 		  <div className="chat-buttons">
-			  <button disabled={loading} onClick={send}>
+			  <button disabled={loading || !question.trim()} onClick={send}>
 				{loading ? "Thinking..." : "Send"}
 			  </button>
 		  </div>

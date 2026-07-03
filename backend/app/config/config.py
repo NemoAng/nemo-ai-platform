@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     default_ai_provider: str = "dummy"
     chroma_host: str = "chromadb"
     chroma_port: int = 8000
+    ollama_base_url: str = "http://host.docker.internal:11434"
+    ollama_chat_model: str = "phi3"
+    ollama_embedding_model: str = "nomic-embed-text"
 
     openai_api_key: str | None = None
     openai_base_url: str | None = None

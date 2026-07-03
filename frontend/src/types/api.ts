@@ -30,6 +30,14 @@ export type AskResult = {
   }[];
 };
 
+export type AskStreamMeta = Pick<AskResult, "question" | "provider" | "sources">;
+
+export type AskStreamEvent =
+  | ({ type: "meta" } & AskStreamMeta)
+  | { type: "token"; content: string }
+  | { type: "done" }
+  | { type: "error"; message: string };
+ 
 export type DocumentItem = {
   id: number;
   title: string;
